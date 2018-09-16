@@ -9,6 +9,9 @@ include_directories(${LIBLOGICALACCESS_INCLUDE_DIRS})
 
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fsanitize=address -O1 -fno-omit-frame-pointer -g -llogicalaccess -DUNIX")
 
-add_executable(FunctionalBadges main.cpp Functions.h)
+add_executable(FunctionalBadgeWriter writer_main.cpp functions.h macro.h data.h)
+add_executable(FunctionalBadgeReader reader_main.cpp functions.h macro.h data.h)
+
 link_directories(plugins)
-target_link_libraries(FunctionalBadges ${LIBLOGICALACCESS_LIBRARIES} libmifarecards.so)
+target_link_libraries(FunctionalBadgeWriter ${LIBLOGICALACCESS_LIBRARIES} libmifarecards.so)
+target_link_libraries(FunctionalBadgeReader ${LIBLOGICALACCESS_LIBRARIES} libmifarecards.so)

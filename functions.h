@@ -1,7 +1,3 @@
-//
-// Created by max on 9/14/18.
-//
-
 #ifndef FUNCTIONALBADGES_FUNCTIONS_H
 #define FUNCTIONALBADGES_FUNCTIONS_H
 
@@ -10,22 +6,7 @@
 
 #include <boost/format.hpp>
 
-#include <logicalaccess/dynlibrary/librarymanager.hpp>
-#include <logicalaccess/readerproviders/readerconfiguration.hpp>
-#include <logicalaccess/cards/chip.hpp>
-#include <logicalaccess/plugins/readers/pcsc/pcscreaderprovider.hpp>
-#include <logicalaccess/bufferhelper.hpp>
-#include <logicalaccess/services/storage/storagecardservice.hpp>
-#include <logicalaccess/plugins/cards/mifare/mifarechip.hpp>
-#include <logicalaccess/plugins/cards/mifare/mifarelocation.hpp>
-#include <logicalaccess/plugins/cards/mifare/mifareaccessinfo.hpp>
-
-
-template <typename T>
-using shared_ptr = std::shared_ptr<T>;
-
-#define lla_ptr(T) std::shared_ptr<logicalaccess::T>
-#define lla_ptr_dynamic_cast(T, R) std::dynamic_pointer_cast<logicalaccess::T>(R)
+#include "macro.h"
 
 constexpr int MAX_ADDRESS = 1023;
 
@@ -39,11 +20,11 @@ constexpr int MAX_ADDRESS = 1023;
  * @param autoSwitchBlock If the block and sector indices will be automatically managed
  * @return A vector containing the read bytes
  */
-std::vector<uint8_t> readFromLocation(lla_ptr(StorageCardService) const &storageService,
-                                      lla_ptr(MifareLocation) const &memoryLocation,
-                                      lla_ptr(MifareAccessInfo) const &accessInfo,
-                                      unsigned int bytesToRead,
-                                      bool autoSwitchBlock) {
+inline std::vector<uint8_t> readFromLocation(lla_ptr(StorageCardService) storageService,
+                                             lla_ptr(MifareLocation) memoryLocation,
+                                             lla_ptr(MifareAccessInfo) accessInfo,
+                                             unsigned int bytesToRead,
+                                             bool autoSwitchBlock) {
     return storageService->readData(memoryLocation, accessInfo, bytesToRead,
                                     autoSwitchBlock ? logicalaccess::CB_AUTOSWITCHAREA
                                                     : logicalaccess::CB_DEFAULT);
@@ -59,11 +40,11 @@ std::vector<uint8_t> readFromLocation(lla_ptr(StorageCardService) const &storage
  * @param autoSwitchBlock If the block and sector indices will be automatically managed
  * @return The read string
  */
-std::string readStringFromLocation(lla_ptr(StorageCardService) const &storageService,
-                                   lla_ptr(MifareLocation) const &memoryLocation,
-                                   lla_ptr(MifareAccessInfo) const &accessInfo,
-                                   unsigned int bytesToRead,
-                                   bool autoSwitchBlock) {
+inline std::string readStringFromLocation(lla_ptr(StorageCardService) storageService,
+                                          lla_ptr(MifareLocation) memoryLocation,
+                                          lla_ptr(MifareAccessInfo) accessInfo,
+                                          unsigned int bytesToRead,
+                                          bool autoSwitchBlock) {
     auto data = readFromLocation(storageService, memoryLocation, accessInfo, bytesToRead, autoSwitchBlock);
     return std::string(data.begin(), data.end());
 }
@@ -78,12 +59,12 @@ std::string readStringFromLocation(lla_ptr(StorageCardService) const &storageSer
  * @param data The data to write
  * @param autoSwitchBlock If the block and sector indices will be automatically managed
  */
-void writeDataToLocation(lla_ptr(StorageCardService) const &storageService,
-                         lla_ptr(MifareLocation) const &memoryLocation,
-                         lla_ptr(MifareAccessInfo) const &accessInfo,
-                         lla_ptr(MifareAccessInfo) const &accessInfoToWrite,
-                         const std::vector<unsigned char> &data,
-                         bool autoSwitchBlock) {
+inline void writeDataToLocation(lla_ptr(StorageCardService) storageService,
+                                lla_ptr(MifareLocation) memoryLocation,
+                                lla_ptr(MifareAccessInfo) accessInfo,
+                                lla_ptr(MifareAccessInfo) accessInfoToWrite,
+                                const std::vector<unsigned char> &data,
+                                bool autoSwitchBlock) {
     storageService->writeData(memoryLocation, accessInfo, accessInfoToWrite, data,
                               autoSwitchBlock ? logicalaccess::CB_AUTOSWITCHAREA
                                               : logicalaccess::CB_DEFAULT);
@@ -99,17 +80,17 @@ void writeDataToLocation(lla_ptr(StorageCardService) const &storageService,
  * @param data The string to write
  * @param autoSwitchBlock If the block and sector indices will be automatically managed
  */
-void writeStringToLocation(lla_ptr(StorageCardService) const &storageService,
-                           lla_ptr(MifareLocation) const &memoryLocation,
-                           lla_ptr(MifareAccessInfo) const &accessInfo,
-                           lla_ptr(MifareAccessInfo) const &accessInfoToWrite,
-                           std::string const &data,
-                           bool autoSwitchBlock) {
+inline void writeStringToLocation(lla_ptr(StorageCardService) storageService,
+                                  lla_ptr(MifareLocation) memoryLocation,
+                                  lla_ptr(MifareAccessInfo) accessInfo,
+                                  lla_ptr(MifareAccessInfo) accessInfoToWrite,
+                                  std::string data,
+                                  bool autoSwitchBlock) {
     writeDataToLocation(storageService, memoryLocation, accessInfo, accessInfoToWrite,
                         std::vector<uint8_t>(data.begin(), data.end()), autoSwitchBlock);
 }
 
-std::string locationHex(int sector, int block, int byte) {
+inline std::string locationHex(int sector, int block, int byte) {
     int address = (sector * (16 * 4)) + (block * 16) + byte;
 
     if (address > MAX_ADDRESS)
@@ -120,13 +101,20 @@ std::string locationHex(int sector, int block, int byte) {
     return std::string(buf);
 }
 
-std::string locationHex(lla_ptr(MifareLocation) const &mem) {
+inline std::string locationHex(lla_ptr(MifareLocation) mem) {
     return locationHex(mem->sector, mem->block, mem->byte);
 }
 
-std::string describeLocation(lla_ptr(MifareLocation) const &mem) {
+inline std::string describeLocation(lla_ptr(MifareLocation) mem) {
     return boost::str(boost::format("0x%4%\nSector %1%\nBlock %2%\nByte %3%") % mem->sector % mem->block % mem->byte %
                      locationHex(mem));
+}
+
+inline lla_ptr(MifareLocation) location(const int* a) {
+    lla_ptr(MifareLocation) l(new logicalaccess::MifareLocation());
+    l->sector = a[0];
+    l->block = a[1];
+    return l;
 }
 
 #endif //FUNCTIONALBADGES_FUNCTIONS_H
