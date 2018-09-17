@@ -1,3 +1,4 @@
+#define READER
 #include <iostream>
 #include "functions.h"
 #include "data.h"
@@ -45,8 +46,14 @@ int main() {
                 cd.accessInfo = accessInfo;
 
                 auto name = readStudentName(cd);
+                auto id = readStudentId(cd);
+                auto grade = readStudentGrade(cd);
 
-                std::cout << "Student Name: " << std::get<0>(name) << " " << std::get<1>(name) << "\n\n";
+                std::cout << "Student Name: " << std::get<0>(name) << " " << std::get<1>(name) << std::endl;
+                std::cout << "Student Id: " << id << std::endl;
+                std::cout << "Student Grade: " << grade << std::endl;
+
+                std::cout << std::endl;
 
                 readerConfig->getReaderUnit()->waitRemoval(0);
             } else {

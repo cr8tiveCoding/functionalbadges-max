@@ -49,6 +49,8 @@ inline std::string readStringFromLocation(lla_ptr(StorageCardService) storageSer
     return std::string(data.begin(), data.end());
 }
 
+#ifdef WRITER
+
 /**
  * Write the specified data starting at the given location
  *
@@ -89,6 +91,8 @@ inline void writeStringToLocation(lla_ptr(StorageCardService) storageService,
     writeDataToLocation(storageService, memoryLocation, accessInfo, accessInfoToWrite,
                         std::vector<uint8_t>(data.begin(), data.end()), autoSwitchBlock);
 }
+
+#endif //WRITER
 
 inline std::string locationHex(int sector, int block, int byte) {
     int address = (sector * (16 * 4)) + (block * 16) + byte;

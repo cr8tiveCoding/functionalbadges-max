@@ -1,3 +1,4 @@
+#define WRITER
 #include <iostream>
 #include "functions.h"
 #include "data.h"
@@ -21,11 +22,19 @@ int main() {
 
     readerConfig->getReaderUnit()->connectToReader();
 
-    std::string fName, lName;
+    std::string fName, lName, id, buf;
+    uint8_t grade;
+
     std::cout << "First name: ";
     std::cin >> fName;
     std::cout << "Last name: ";
     std::cin >> lName;
+    std::cout << "Id: ";
+    std::cin >> id;
+    std::cout << "Grade: ";
+    std::cin >> buf;
+
+    grade = static_cast<uint8_t>(std::stoi(buf));
 
     std::cout << "Please apply card..." << std::endl;
     if (readerConfig->getReaderUnit()->waitInsertion(0)) {
@@ -51,6 +60,12 @@ int main() {
 
             writeStudentName(cd, fName, lName);
             std::cout << "Wrote student name " << fName << " " << lName << std::endl;
+
+            writeStudentId(cd, id);
+            std::cout << "Wrote student Id " << id << std::endl;
+
+            writeStudentGrade(cd, grade);
+            std::cout << "Wrote student grade " << grade << std::endl;
 
         } else {
             std::cerr << "Card connection failure" << std::endl;
