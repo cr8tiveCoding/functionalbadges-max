@@ -22,7 +22,7 @@ int main() {
 
     readerConfig->getReaderUnit()->connectToReader();
 
-    std::string fName, lName, id, buf;
+    std::string fName, lName, id, gradeStr;
     uint8_t grade;
 
     std::cout << "First name: ";
@@ -32,9 +32,9 @@ int main() {
     std::cout << "Id: ";
     std::cin >> id;
     std::cout << "Grade: ";
-    std::cin >> buf;
+    std::cin >> gradeStr;
 
-    grade = static_cast<uint8_t>(std::stoi(buf));
+    grade = static_cast<uint8_t>(std::stoi(gradeStr));
 
     std::cout << "Please apply card..." << std::endl;
     if (readerConfig->getReaderUnit()->waitInsertion(0)) {
@@ -65,7 +65,7 @@ int main() {
             std::cout << "Wrote student Id " << id << std::endl;
 
             writeStudentGrade(cd, grade);
-            std::cout << "Wrote student grade " << grade << std::endl;
+            std::cout << "Wrote student grade " << gradeStr << std::endl;
 
         } else {
             std::cerr << "Card connection failure" << std::endl;

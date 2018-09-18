@@ -31,7 +31,7 @@ inline uint8_t readStudentGrade(CardData const& cd) {
 #ifdef WRITER
 
 inline void writeStudentGrade(CardData const& cd, uint8_t grade) {
-    writeDataToLocation(cd.storageService, location(gradeLocation), cd.accessInfo, nullptr, std::vector<uint8_t>(grade), false);
+    writeDataToLocation(cd.storageService, location(gradeLocation), cd.accessInfo, nullptr, {grade}, false);
 }
 
 inline void writeStudentId(CardData const& cd, std::string id) {

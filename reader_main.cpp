@@ -51,7 +51,7 @@ int main() {
 
                 std::cout << "Student Name: " << std::get<0>(name) << " " << std::get<1>(name) << std::endl;
                 std::cout << "Student Id: " << id << std::endl;
-                std::cout << "Student Grade: " << grade << std::endl;
+                std::cout << "Student Grade: " << std::to_string(grade) << std::endl;
 
                 std::cout << std::endl;
 
