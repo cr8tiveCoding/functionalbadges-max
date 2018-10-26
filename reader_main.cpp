@@ -3,6 +3,10 @@
 #include "functions.h"
 #include "data.h"
 
+#define OUT_PATH "./read_output"
+
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wmissing-noreturn"
 int main() {
     lla_ptr(ReaderConfiguration) readerConfig(new logicalaccess::ReaderConfiguration());
 
@@ -22,40 +26,49 @@ int main() {
 
     readerConfig->getReaderUnit()->connectToReader();
 
-    while (true) {
+    for (;;) {
         std::cout << "Please apply card..." << std::endl;
         if (readerConfig->getReaderUnit()->waitInsertion(0)) {
             if (readerConfig->getReaderUnit()->connect()) {
 
-                lla_ptr(Chip) chip = readerConfig->getReaderUnit()->getSingleChip();
+                try {
+                    lla_ptr(Chip) chip = readerConfig->getReaderUnit()->getSingleChip();
 
-                lla_ptr(MifareChip) mifareChip = lla_ptr_dynamic_cast(MifareChip, chip);
-                if (!mifareChip) {
-                    std::cerr << "I was expecting a Mifare chip. Goodbye" << std::endl;
-                    return EXIT_FAILURE;
+                    lla_ptr(MifareChip) mifareChip = lla_ptr_dynamic_cast(MifareChip, chip);
+                    if (!mifareChip) {
+                        std::cerr << "Card must be Mifare 1K. Please remove card" << std::endl;
+                        readerConfig->getReaderUnit()->waitRemoval(0);
+                        continue;
+                    }
+
+                    // DO CHIP COMMANDS
+
+                    auto storageService = lla_ptr_dynamic_cast(StorageCardService,
+                                                               chip->getService(logicalaccess::CST_STORAGE));
+                    auto accessInfo = lla_ptr(MifareAccessInfo)(new logicalaccess::MifareAccessInfo());
+                    accessInfo->keyA->fromString("ff ff ff ff ff ff");
+
+                    CardData cd;
+                    cd.storageService = storageService;
+                    cd.accessInfo = accessInfo;
+
+                    auto name = readStudentName(cd);
+                    auto id = readStudentId(cd);
+                    auto grade = readStudentGrade(cd);
+
+                    std::cout << appendToFile(OUT_PATH, "Student Name: " + std::get<0>(name) + " " + std::get<1>(name) + "\n");
+                    std::cout << appendToFile(OUT_PATH, "Student Id: " + id + "\n");
+                    std::cout << appendToFile(OUT_PATH, "Student Grade: " + std::to_string(grade) + "\n");
+
+                    std::cout << appendToFile(OUT_PATH, "\n");
+
+                    readerConfig->getReaderUnit()->waitRemoval(0);
+
+                } catch (logicalaccess::CardException& e) {
+                    std::cerr << "Caught an exception: " << e.error_code() << " -- " << e.what() << std::endl <<
+                        "Did you remove the card too soon?" << std::endl;
+                    readerConfig->getReaderUnit()->waitRemoval(15);
                 }
-
-                // DO CHIP COMMANDS
-
-                auto storageService = lla_ptr_dynamic_cast(StorageCardService, chip->getService(logicalaccess::CST_STORAGE));
-                auto accessInfo     = lla_ptr(MifareAccessInfo)(new logicalaccess::MifareAccessInfo());
-                accessInfo->keyA->fromString("ff ff ff ff ff ff");
-
-                CardData cd;
-                cd.storageService = storageService;
-                cd.accessInfo = accessInfo;
-
-                auto name = readStudentName(cd);
-                auto id = readStudentId(cd);
-                auto grade = readStudentGrade(cd);
-
-                std::cout << "Student Name: " << std::get<0>(name) << " " << std::get<1>(name) << std::endl;
-                std::cout << "Student Id: " << id << std::endl;
-                std::cout << "Student Grade: " << std::to_string(grade) << std::endl;
-
-                std::cout << std::endl;
-
-                readerConfig->getReaderUnit()->waitRemoval(0);
             } else {
                 std::cerr << "Card connection failure" << std::endl;
             }
@@ -64,3 +77,4 @@ int main() {
         }
     }
 }
+#pragma clang diagnostic pop

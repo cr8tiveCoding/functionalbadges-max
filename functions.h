@@ -49,6 +49,29 @@ inline std::string readStringFromLocation(lla_ptr(StorageCardService) storageSer
     return std::string(data.begin(), data.end());
 }
 
+/**
+ * Append a string to a file.
+ *
+ * @param path The path to the file
+ * @param line The string to append
+ * @return The string who was appended
+ */
+inline std::string appendToFile(std::string path, std::string line) {
+    std::ofstream file;
+    file.open(path, std::ios::out | std::ios::app);
+
+    if (file.fail())
+        throw std::ios_base::failure(strerror(errno));
+
+    file.exceptions(file.exceptions() | std::ios::failbit | std::ifstream::badbit);
+
+    file << line;
+
+    file.close();
+
+    return line;
+}
+
 #ifdef WRITER
 
 /**
