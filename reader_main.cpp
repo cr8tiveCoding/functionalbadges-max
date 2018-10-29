@@ -2,6 +2,7 @@
 #include <iostream>
 #include "functions.h"
 #include "data.h"
+#include "web.h"
 
 #define OUT_PATH "./read_output"
 
@@ -63,6 +64,8 @@ int main() {
                     std::cout << appendToFile(OUT_PATH, "UUID: " + boost::uuids::to_string(uuid) + "\n");
 
                     std::cout << appendToFile(OUT_PATH, "\n");
+
+                    sendData(std::get<0>(name), std::get<1>(name), id, grade, uuid);
 
                     readerConfig->getReaderUnit()->waitRemoval(0);
 
