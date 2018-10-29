@@ -4,10 +4,15 @@
 #include "macro.h"
 #include "functions.h"
 
+#include <boost/uuid/uuid.hpp>
+#include <boost/uuid/uuid_generators.hpp>
+#include <boost/uuid/uuid_io.hpp>
+
 constexpr int firstNameLocation [2] = {3, 0},
               lastNameLocation  [2] = {3, 1},
               idLocation        [2] = {3, 2},
-              gradeLocation     [2] = {4, 0};
+              gradeLocation     [2] = {4, 0},
+              uuidLocation      [2] = {4, 1};
 
 typedef struct {
     lla_ptr(StorageCardService) storageService;
@@ -28,7 +33,25 @@ inline uint8_t readStudentGrade(CardData const& cd) {
     return readFromLocation(cd.storageService, location(gradeLocation), cd.accessInfo, 1, false)[0];
 }
 
+inline boost::uuids::uuid readUuid(CardData const& cd) {
+    std::vector<uint8_t> bytes = readFromLocation(cd.storageService, location(uuidLocation), cd.accessInfo, 16, false);
+    boost::uuids::uuid u {};
+    uint8_t* bytesArr = &bytes[0];
+    memcpy(&u, bytesArr, 16);
+    return u;
+}
+
 #ifdef WRITER
+
+inline boost::uuids::uuid genUuid() {
+    return boost::uuids::random_generator()();
+}
+
+inline std::vector<uint8_t> uuidBytes(boost::uuids::uuid u) {
+    std::vector<uint8_t> v(u.size());
+    std::copy(u.begin(), u.end(), v.begin());
+    return v;
+}
 
 inline void writeStudentGrade(CardData const& cd, uint8_t grade) {
     writeDataToLocation(cd.storageService, location(gradeLocation), cd.accessInfo, nullptr, {grade}, false);
@@ -49,6 +72,12 @@ inline void writeStudentName(CardData const& cd, std::string first, std::string 
 
     writeStringToLocation(cd.storageService, location(firstNameLocation), cd.accessInfo, nullptr, first, false);
     writeStringToLocation(cd.storageService, location(lastNameLocation), cd.accessInfo, nullptr, last, false);
+}
+
+inline boost::uuids::uuid writeUuid(CardData const& cd) {
+    boost::uuids::uuid uuid = genUuid();
+    writeDataToLocation(cd.storageService, location(uuidLocation), cd.accessInfo, nullptr, uuidBytes(uuid), false);
+    return uuid;
 }
 
 #endif //WRITER

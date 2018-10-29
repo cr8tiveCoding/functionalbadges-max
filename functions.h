@@ -88,7 +88,7 @@ inline void writeDataToLocation(lla_ptr(StorageCardService) storageService,
                                 lla_ptr(MifareLocation) memoryLocation,
                                 lla_ptr(MifareAccessInfo) accessInfo,
                                 lla_ptr(MifareAccessInfo) accessInfoToWrite,
-                                const std::vector<unsigned char> &data,
+                                const std::vector<uint8_t> &data,
                                 bool autoSwitchBlock) {
     storageService->writeData(memoryLocation, accessInfo, accessInfoToWrite, data,
                               autoSwitchBlock ? logicalaccess::CB_AUTOSWITCHAREA

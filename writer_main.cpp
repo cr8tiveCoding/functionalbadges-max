@@ -67,6 +67,9 @@ int main() {
             writeStudentGrade(cd, grade);
             std::cout << "Wrote student grade " << gradeStr << std::endl;
 
+            auto uuid = writeUuid(cd);
+            std::cout << "Generated and wrote UUID " << boost::uuids::to_string(uuid) << std::endl;
+
         } else {
             std::cerr << "Card connection failure" << std::endl;
         }

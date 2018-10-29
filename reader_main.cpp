@@ -55,10 +55,12 @@ int main() {
                     auto name = readStudentName(cd);
                     auto id = readStudentId(cd);
                     auto grade = readStudentGrade(cd);
+                    auto uuid = readUuid(cd);
 
                     std::cout << appendToFile(OUT_PATH, "Student Name: " + std::get<0>(name) + " " + std::get<1>(name) + "\n");
                     std::cout << appendToFile(OUT_PATH, "Student Id: " + id + "\n");
                     std::cout << appendToFile(OUT_PATH, "Student Grade: " + std::to_string(grade) + "\n");
+                    std::cout << appendToFile(OUT_PATH, "UUID: " + boost::uuids::to_string(uuid) + "\n");
 
                     std::cout << appendToFile(OUT_PATH, "\n");
 
