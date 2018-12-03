@@ -3,6 +3,7 @@
 #include "functions.h"
 #include "data.h"
 #include "web.h"
+#include "timing.h"
 
 #define OUT_PATH "./read_output"
 
@@ -31,7 +32,6 @@ int main() {
         std::cout << "Please apply card..." << std::endl;
         if (readerConfig->getReaderUnit()->waitInsertion(0)) {
             if (readerConfig->getReaderUnit()->connect()) {
-
                 try {
                     lla_ptr(Chip) chip = readerConfig->getReaderUnit()->getSingleChip();
 
@@ -53,10 +53,19 @@ int main() {
                     cd.storageService = storageService;
                     cd.accessInfo = accessInfo;
 
-                    auto name = readStudentName(cd);
-                    auto id = readStudentId(cd);
-                    auto grade = readStudentGrade(cd);
-                    auto uuid = readUuid(cd);
+                    std::tuple<std::string, std::string> name;
+                    std::string id;
+                    uint8_t grade;
+                    boost::uuids::uuid uuid {};
+
+                    long readingTime = Measure<>::execution([&name, &id, &grade, &uuid, &cd]() {
+                        name  = readStudentName(cd);
+                        id    = readStudentId(cd);
+                        grade = readStudentGrade(cd);
+                        uuid  = readUuid(cd);
+                    });
+
+                    std::cout << "Reading time: " << readingTime << "ms" << std::endl;
 
                     std::cout << appendToFile(OUT_PATH, "Student Name: " + std::get<0>(name) + " " + std::get<1>(name) + "\n");
                     std::cout << appendToFile(OUT_PATH, "Student Id: " + id + "\n");
@@ -65,7 +74,11 @@ int main() {
 
                     std::cout << appendToFile(OUT_PATH, "\n");
 
-                    sendData(std::get<0>(name), std::get<1>(name), id, grade, uuid);
+                    long networkTime = Measure<>::execution(
+                            sendData, std::get<0>(name), std::get<1>(name), id, grade, uuid
+                    );
+
+                    std::cout << "Network out time: " << networkTime << "ms" << std::endl;
 
                     readerConfig->getReaderUnit()->waitRemoval(0);
 

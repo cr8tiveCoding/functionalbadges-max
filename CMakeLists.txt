@@ -11,7 +11,7 @@ include_directories(/usr/local/include/pistache)
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fsanitize=address -O1 -fno-omit-frame-pointer -g -llogicalaccess -DUNIX")
 
 add_executable(FunctionalBadgeWriter writer_main.cpp functions.h macro.h data.h)
-add_executable(FunctionalBadgeReader reader_main.cpp functions.h macro.h data.h web.h)
+add_executable(FunctionalBadgeReader reader_main.cpp functions.h macro.h data.h web.h timing.h)
 
 link_directories(plugins)
 target_link_libraries(FunctionalBadgeWriter ${LIBLOGICALACCESS_LIBRARIES} libmifarecards.so)

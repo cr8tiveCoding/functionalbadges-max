@@ -27,8 +27,19 @@ inline void sendData(std::string first, std::string last, std::string id, uint8_
           .body(body)
           .send()
           .then([&client](Pistache::Http::Response response) {
+              switch (response.code()) {
+                  case Pistache::Http::Code::Ok:
+                      std::cout << "Server accepted entry (" << response.body() << ")" << std::endl;
+                      break;
+                  case Pistache::Http::Code::Forbidden:
+                      std::cout << "Server rejected entry (" << response.body() << ")" << std::endl;
+                      break;
+                  default:
+                      std::cout << "Server responded with unexpected " << response.code() << std::endl;
+              }
               client.shutdown();
-          }, [&client](auto x) {
+          }, [&client](std::exception_ptr x) {
+              std::cerr << "Connection exception: " << x.__cxa_exception_type() << std::endl;
              client.shutdown();
           });
 }
