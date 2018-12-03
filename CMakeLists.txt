@@ -8,7 +8,8 @@ set(CMAKE_CXX_STANDARD 17)
 include_directories(${LIBLOGICALACCESS_INCLUDE_DIRS})
 include_directories(/usr/local/include/pistache)
 
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fsanitize=address -O1 -fno-omit-frame-pointer -g -llogicalaccess -DUNIX")
+set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -fsanitize=address -O1 -fno-omit-frame-pointer -g -llogicalaccess -DUNIX -Wall")
+set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -O3 -g -llogicalaccess -DUNIX -Wall -pthread")
 
 add_executable(FunctionalBadgeWriter writer_main.cpp functions.h macro.h data.h)
 add_executable(FunctionalBadgeReader reader_main.cpp functions.h macro.h data.h web.h timing.h)

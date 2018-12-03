@@ -6,6 +6,7 @@
 #include "timing.h"
 
 #define OUT_PATH "./read_output"
+#define TIME_PATH "./time_output.csv"
 
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wmissing-noreturn"
@@ -79,6 +80,8 @@ int main() {
                     );
 
                     std::cout << "Network out time: " << networkTime << "ms" << std::endl;
+
+                    appendToFile(TIME_PATH, std::to_string(readingTime) + "," + std::to_string(networkTime) + "\n");
 
                     readerConfig->getReaderUnit()->waitRemoval(0);
 
