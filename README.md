@@ -1,13 +1,14 @@
-# FunctionalBadges/JuicyBadge WIP
+# JuicyBadge
 
 ## Build Dependencies
 * CMake 3.12
 * Git
+* C++17 Compliant Compiler
 
 ## Compile Dependencies
 * Boost
 * OpenSSL (libssl-dev)
-* Pistache
+* Pistache IO
 
 ## Runtime Dependencies
 * pcscd
